@@ -11,6 +11,9 @@ const Dashboard = () => {
   const [dragActive, setDragActive] = useState(false);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string>("");
+  const [ideaCentral, setIdeaCentral] = useState<string>("");
+  const [formato, setFormato] = useState<string>("storytelling");
+  const [tono, setTono] = useState<string>("inspiracional");
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -214,7 +217,89 @@ const Dashboard = () => {
                   {/* Sección inferior – Texto + opciones */}
                   <div className="rounded-xl border border-subtle bg-card p-8">
                     <h3 className="text-sm font-medium mb-6">Idea central y configuración</h3>
-                    <div className="h-64 rounded-lg border border-subtle bg-muted/20"></div>
+                    
+                    <div className="space-y-6">
+                      {/* Textarea para idea central */}
+                      <div>
+                        <label className="text-xs font-medium text-foreground/70 mb-2 block">
+                          Idea central (opcional)
+                        </label>
+                        <textarea
+                          value={ideaCentral}
+                          onChange={(e) => setIdeaCentral(e.target.value)}
+                          placeholder="Describe la idea principal de tu historia..."
+                          className="w-full min-h-[120px] px-4 py-3 rounded-lg border border-subtle bg-background text-sm resize-none focus:outline-none focus:ring-2 focus:ring-foreground/20 transition-smooth"
+                        />
+                      </div>
+
+                      {/* Selector de Formato */}
+                      <div>
+                        <label className="text-xs font-medium text-foreground/70 mb-3 block">
+                          Formato <span className="text-destructive">*</span>
+                        </label>
+                        <div className="space-y-2">
+                          {[
+                            { value: 'storytelling', label: 'Storytelling de impacto' },
+                            { value: 'post', label: 'Post social' },
+                            { value: 'caso', label: 'Resumen de caso' }
+                          ].map((option) => (
+                            <label
+                              key={option.value}
+                              className={cn(
+                                "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-smooth",
+                                formato === option.value
+                                  ? "border-foreground bg-muted/30"
+                                  : "border-subtle hover:bg-muted/20"
+                              )}
+                            >
+                              <input
+                                type="radio"
+                                name="formato"
+                                value={option.value}
+                                checked={formato === option.value}
+                                onChange={(e) => setFormato(e.target.value)}
+                                className="w-4 h-4"
+                              />
+                              <span className="text-sm">{option.label}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Selector de Tono */}
+                      <div>
+                        <label className="text-xs font-medium text-foreground/70 mb-3 block">
+                          Tono <span className="text-destructive">*</span>
+                        </label>
+                        <div className="space-y-2">
+                          {[
+                            { value: 'inspiracional', label: 'Inspiracional' },
+                            { value: 'educativo', label: 'Educativo' },
+                            { value: 'tecnico', label: 'Técnico' }
+                          ].map((option) => (
+                            <label
+                              key={option.value}
+                              className={cn(
+                                "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-smooth",
+                                tono === option.value
+                                  ? "border-foreground bg-muted/30"
+                                  : "border-subtle hover:bg-muted/20"
+                              )}
+                            >
+                              <input
+                                type="radio"
+                                name="tono"
+                                value={option.value}
+                                checked={tono === option.value}
+                                onChange={(e) => setTono(e.target.value)}
+                                className="w-4 h-4"
+                              />
+                              <span className="text-sm">{option.label}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Sección de Resultado */}
