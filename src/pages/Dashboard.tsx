@@ -1,13 +1,16 @@
 import { useState } from "react";
-import { Sparkles, Plus, History, Settings, Upload, FileText, ChevronLeft } from "lucide-react";
+import { Sparkles, Plus, History, Settings, Upload, FileText, ChevronLeft, X, ImagePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<'nueva' | 'versiones' | 'ajustes'>('nueva');
   const [dragActive, setDragActive] = useState(false);
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string>("");
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -23,7 +26,41 @@ const Dashboard = () => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    // Handle file drop logic here
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFile(e.target.files[0]);
+    }
+  };
+
+  const handleFile = (file: File) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    
+    if (!allowedTypes.includes(file.type)) {
+      setImageError("Formato no válido. Solo se permiten JPEG, PNG, WEBP o GIF.");
+      toast.error("Formato no válido", {
+        description: "Solo se permiten archivos JPEG, PNG, WEBP o GIF."
+      });
+      return;
+    }
+
+    setImageError("");
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setUploadedImage(reader.result as string);
+      toast.success("Imagen cargada correctamente");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = () => {
+    setUploadedImage(null);
+    setImageError("");
   };
 
   return (
@@ -120,7 +157,58 @@ const Dashboard = () => {
                   {/* Sección superior – Subida de imagen */}
                   <div className="rounded-xl border border-subtle bg-card p-8">
                     <h3 className="text-sm font-medium mb-6">Subir imagen (opcional)</h3>
-                    <div className="h-48 rounded-lg border border-subtle bg-muted/20"></div>
+                    
+                    {!uploadedImage ? (
+                      <div
+                        className={cn(
+                          "relative h-48 rounded-lg border-2 border-dashed transition-smooth flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-foreground/30 hover:bg-muted/30",
+                          dragActive ? "border-foreground bg-muted/40" : "border-subtle bg-muted/20",
+                          imageError && "border-destructive/50"
+                        )}
+                        onDragEnter={handleDrag}
+                        onDragLeave={handleDrag}
+                        onDragOver={handleDrag}
+                        onDrop={handleDrop}
+                        onClick={() => document.getElementById('image-upload')?.click()}
+                      >
+                        <ImagePlus className="w-10 h-10 text-muted-foreground/50" />
+                        <div className="text-center">
+                          <p className="text-sm text-foreground/70 mb-1">
+                            Sube una imagen (opcional)
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            JPEG, PNG, WEBP o GIF
+                          </p>
+                        </div>
+                        <input
+                          id="image-upload"
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp,image/gif"
+                          className="hidden"
+                          onChange={handleFileInput}
+                        />
+                      </div>
+                    ) : (
+                      <div className="relative h-48 rounded-lg overflow-hidden bg-muted/20 border border-subtle">
+                        <img 
+                          src={uploadedImage} 
+                          alt="Preview" 
+                          className="w-full h-full object-contain"
+                        />
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-2 right-2 h-8 w-8"
+                          onClick={removeImage}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    )}
+                    
+                    {imageError && (
+                      <p className="text-xs text-destructive mt-2">{imageError}</p>
+                    )}
                   </div>
 
                   {/* Sección inferior – Texto + opciones */}
