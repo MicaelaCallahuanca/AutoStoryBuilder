@@ -117,79 +117,22 @@ const Dashboard = () => {
             <div className="max-w-5xl mx-auto space-y-8">
               {activeSection === 'nueva' && (
                 <>
-                  {/* AI Agent Placeholder */}
-                  <div className="rounded-xl border border-subtle bg-card p-12 text-center space-y-4">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted/50 mb-4">
-                      <Sparkles className="w-8 h-8 text-muted-foreground" />
-                    </div>
-                    <div className="space-y-2">
-                      <h2 className="text-xl font-semibold">Agente IA</h2>
-                      <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                        Aquí se integrará el agente de inteligencia artificial para procesar tus archivos
-                        y generar la historia visual.
-                      </p>
-                    </div>
+                  {/* Sección superior – Subida de imagen */}
+                  <div className="rounded-xl border border-subtle bg-card p-8">
+                    <h3 className="text-sm font-medium mb-6">Subir imagen (opcional)</h3>
+                    <div className="h-48 rounded-lg border border-subtle bg-muted/20"></div>
                   </div>
 
-                  {/* Upload Area */}
-                  <div className="space-y-4">
-                    <h3 className="text-sm font-medium">Archivos para procesar</h3>
-                    <div
-                      onDragEnter={handleDrag}
-                      onDragLeave={handleDrag}
-                      onDragOver={handleDrag}
-                      onDrop={handleDrop}
-                      className={cn(
-                        "rounded-xl border-2 border-dashed transition-smooth p-12",
-                        dragActive 
-                          ? "border-foreground bg-muted/50" 
-                          : "border-subtle hover:border-foreground/50 hover:bg-muted/30"
-                      )}
-                    >
-                      <div className="text-center space-y-4">
-                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-muted/50">
-                          <Upload className="w-6 h-6 text-muted-foreground" />
-                        </div>
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium">
-                            Arrastra tus archivos aquí o haz clic para seleccionar
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            Soporta PDF, DOCX, imágenes, CSV y más
-                          </p>
-                        </div>
-                        <Button variant="outline" size="sm">
-                          Seleccionar archivos
-                        </Button>
-                      </div>
-                    </div>
+                  {/* Sección inferior – Texto + opciones */}
+                  <div className="rounded-xl border border-subtle bg-card p-8">
+                    <h3 className="text-sm font-medium mb-6">Idea central y configuración</h3>
+                    <div className="h-64 rounded-lg border border-subtle bg-muted/20"></div>
                   </div>
 
-                  {/* Preview Area */}
-                  <div className="space-y-4">
-                    <h3 className="text-sm font-medium">Vista previa</h3>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      {[1, 2].map((item) => (
-                        <div key={item} className="rounded-xl border border-subtle bg-card p-6 space-y-4">
-                          <div className="aspect-video rounded-lg bg-muted/50 flex items-center justify-center">
-                            <FileText className="w-8 h-8 text-muted-foreground/50" />
-                          </div>
-                          <div className="space-y-2">
-                            <p className="text-sm font-medium">Archivo ejemplo {item}</p>
-                            <p className="text-xs text-muted-foreground">
-                              No hay archivos cargados aún
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end pt-4">
-                    <Button size="lg" className="gap-2">
-                      <Sparkles className="w-4 h-4" />
-                      Generar historia
-                    </Button>
+                  {/* Sección de Resultado */}
+                  <div className="rounded-xl border border-subtle bg-card p-8">
+                    <h3 className="text-sm font-medium mb-6">Narrativa generada</h3>
+                    <div className="h-96 rounded-lg border border-subtle bg-muted/20"></div>
                   </div>
                 </>
               )}
