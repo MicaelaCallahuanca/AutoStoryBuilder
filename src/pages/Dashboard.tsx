@@ -14,6 +14,8 @@ const Dashboard = () => {
   const [ideaCentral, setIdeaCentral] = useState<string>("");
   const [formato, setFormato] = useState<string>("storytelling");
   const [tono, setTono] = useState<string>("inspiracional");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedNarrative, setGeneratedNarrative] = useState<string>("");
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -64,6 +66,60 @@ const Dashboard = () => {
   const removeImage = () => {
     setUploadedImage(null);
     setImageError("");
+  };
+
+  const handleGenerateStory = async () => {
+    // Validation: at least image or text must be provided
+    if (!uploadedImage && !ideaCentral.trim()) {
+      toast.error("Error de validación", {
+        description: "Debes subir una imagen o escribir texto para generar una historia."
+      });
+      return;
+    }
+
+    setIsGenerating(true);
+    setGeneratedNarrative("");
+
+    try {
+      const formData = new FormData();
+      
+      // Add image if available
+      if (uploadedImage) {
+        // Convert base64 to blob
+        const response = await fetch(uploadedImage);
+        const blob = await response.blob();
+        formData.append('image', blob, 'image.jpg');
+      }
+      
+      // Add text if available
+      if (ideaCentral.trim()) {
+        formData.append('text', ideaCentral.trim());
+      }
+      
+      // Add required fields
+      formData.append('tono', tono);
+      formData.append('formato', formato);
+
+      const apiResponse = await fetch('https://srv-d4kalq7pm1nc73ai4rpg.onrender.com/story', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!apiResponse.ok) {
+        throw new Error('Error al generar la historia');
+      }
+
+      const data = await apiResponse.json();
+      setGeneratedNarrative(data.narrative || data.story || JSON.stringify(data));
+      toast.success("Historia generada correctamente");
+    } catch (error) {
+      console.error('Error generating story:', error);
+      toast.error("Error al generar la historia", {
+        description: "Intenta de nuevo más tarde"
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -299,13 +355,44 @@ const Dashboard = () => {
                           ))}
                         </div>
                       </div>
+
+                      {/* Generate Button */}
+                      <div className="pt-4">
+                        <Button
+                          onClick={handleGenerateStory}
+                          disabled={isGenerating}
+                          className="w-full"
+                          size="lg"
+                        >
+                          {isGenerating ? (
+                            <>
+                              <span className="animate-spin mr-2">⏳</span>
+                              Generando...
+                            </>
+                          ) : (
+                            'Generar historia'
+                          )}
+                        </Button>
+                      </div>
                     </div>
                   </div>
 
                   {/* Sección de Resultado */}
                   <div className="rounded-xl border border-subtle bg-card p-8">
                     <h3 className="text-sm font-medium mb-6">Narrativa generada</h3>
-                    <div className="h-96 rounded-lg border border-subtle bg-muted/20"></div>
+                    {generatedNarrative ? (
+                      <div className="min-h-[24rem] rounded-lg border border-subtle bg-background p-6">
+                        <div className="prose prose-sm max-w-none text-foreground whitespace-pre-wrap">
+                          {generatedNarrative}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="h-96 rounded-lg border border-subtle bg-muted/20 flex items-center justify-center">
+                        <p className="text-sm text-muted-foreground">
+                          La narrativa generada aparecerá aquí
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </>
               )}
