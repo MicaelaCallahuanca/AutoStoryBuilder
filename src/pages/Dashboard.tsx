@@ -10,6 +10,7 @@ const Dashboard = () => {
   const [activeSection, setActiveSection] = useState<'nueva' | 'versiones' | 'ajustes'>('nueva');
   const [dragActive, setDragActive] = useState(false);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [imageError, setImageError] = useState<string>("");
   const [ideaCentral, setIdeaCentral] = useState<string>("");
   const [formato, setFormato] = useState<string>("storytelling");
@@ -55,6 +56,7 @@ const Dashboard = () => {
     }
 
     setImageError("");
+    setUploadedFile(file);
     const reader = new FileReader();
     reader.onloadend = () => {
       setUploadedImage(reader.result as string);
@@ -65,6 +67,7 @@ const Dashboard = () => {
 
   const removeImage = () => {
     setUploadedImage(null);
+    setUploadedFile(null);
     setImageError("");
   };
 
@@ -84,16 +87,13 @@ const Dashboard = () => {
       const formData = new FormData();
       
       // Add image if available
-      if (uploadedImage) {
-        // Convert base64 to blob
-        const response = await fetch(uploadedImage);
-        const blob = await response.blob();
-        formData.append('image', blob, 'image.jpg');
+      if (uploadedImage && uploadedFile) {
+        formData.append('image', uploadedFile, uploadedFile.name);
       }
       
-      // Add text if available
+      // Add texto if available
       if (ideaCentral.trim()) {
-        formData.append('text', ideaCentral.trim());
+        formData.append('texto', ideaCentral.trim());
       }
       
       // Add required fields
