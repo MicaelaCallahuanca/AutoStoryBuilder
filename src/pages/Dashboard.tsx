@@ -13,8 +13,8 @@ const Dashboard = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [imageError, setImageError] = useState<string>("");
   const [ideaCentral, setIdeaCentral] = useState<string>("");
-  const [formato, setFormato] = useState<string>("storytelling");
-  const [tono, setTono] = useState<string>("inspiracional");
+  const [formato, setFormato] = useState<string>("Storytelling de impacto");
+  const [tono, setTono] = useState<string>("Inspiracional");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedNarrative, setGeneratedNarrative] = useState<string>("");
 
