@@ -295,9 +295,9 @@ const Dashboard = () => {
                         </label>
                         <div className="space-y-2">
                           {[
-                            { value: 'storytelling', label: 'Storytelling de impacto' },
-                            { value: 'post', label: 'Post social' },
-                            { value: 'caso', label: 'Resumen de caso' }
+                            { value: 'Storytelling de impacto', label: 'Storytelling de impacto' },
+                            { value: 'Post social', label: 'Post social' },
+                            { value: 'Resumen de caso', label: 'Resumen de caso' }
                           ].map((option) => (
                             <label
                               key={option.value}
@@ -329,9 +329,9 @@ const Dashboard = () => {
                         </label>
                         <div className="space-y-2">
                           {[
-                            { value: 'inspiracional', label: 'Inspiracional' },
-                            { value: 'educativo', label: 'Educativo' },
-                            { value: 'tecnico', label: 'Técnico' }
+                            { value: 'Inspiracional', label: 'Inspiracional' },
+                            { value: 'Educativo', label: 'Educativo' },
+                            { value: 'Técnico', label: 'Técnico' }
                           ].map((option) => (
                             <label
                               key={option.value}
