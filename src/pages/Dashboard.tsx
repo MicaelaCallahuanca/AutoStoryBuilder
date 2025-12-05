@@ -100,7 +100,7 @@ const Dashboard = () => {
       formData.append('tono', tono);
       formData.append('formato', formato);
 
-      const apiResponse = await fetch('https://srv-d4kalq7pm1nc73ai4rpg.onrender.com/story', {
+      const apiResponse = await fetch('https://ai-agent-monolitico.onrender.com/story', {
         method: 'POST',
         body: formData,
       });
