@@ -97,8 +97,8 @@ const Dashboard = () => {
       }
       
       // Add required fields
-      formData.append('Tono', tono);
-      formData.append('Formato', formato);
+      formData.append('tono', tono);
+      formData.append('formato', formato);
 
       const apiResponse = await fetch('https://ai-agent-monolitico.onrender.com/story', {
         method: 'POST',
