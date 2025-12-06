@@ -17,7 +17,6 @@ const Dashboard = () => {
   const [tono, setTono] = useState<string>("Inspiracional");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedNarrative, setGeneratedNarrative] = useState<string>("");
-  const [currentStoryId, setCurrentStoryId] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedNarrative, setEditedNarrative] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
@@ -77,11 +76,16 @@ const Dashboard = () => {
   };
 
   const handleEditClick = () => {
+    if (!generatedNarrative) return;
     setEditedNarrative(generatedNarrative);
     setIsEditing(true);
   };
 
   const handleSaveEdit = async () => {
+    if (!storyId) {
+    toast.error("No hay historia generada para guardar");
+    return;
+    }
     setIsSaving(true);
     try {
       const response = await fetch('https://ai-agent-monolitico.onrender.com/save_edit', {
@@ -152,8 +156,11 @@ const Dashboard = () => {
       }
 
       const data = await apiResponse.json();
+      if (!data.story_id) throw new Error("El backend no devolvió story_id");
       setStoryId(data.story_id);
-      setGeneratedNarrative(data.narrative || data.story || JSON.stringify(data));
+      setGeneratedNarrative(data.narrative || data.story || "");
+      setEditedNarrative(data.narrative || data.story || "");
+      setIsEditing(false);
       toast.success("Historia generada correctamente");
     } catch (error) {
       console.error('Error generating story:', error);
