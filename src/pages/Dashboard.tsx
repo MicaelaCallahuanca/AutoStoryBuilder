@@ -21,7 +21,7 @@ const Dashboard = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedNarrative, setEditedNarrative] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
-  const [versionCount, setVersionCount] = useState(1);
+  const [storyId, setStoryId] = useState<string | null>(null);
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -90,8 +90,8 @@ const Dashboard = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          story_id: currentStoryId,     
-          narrative: editedNarrative    
+          story_id: storyId,     
+          narrative: editedNarrative,    
         }),
       });
 
@@ -99,10 +99,10 @@ const Dashboard = () => {
         throw new Error('Error al guardar');
       }
 
+      const data = await response.json();
       setGeneratedNarrative(editedNarrative);
       setIsEditing(false);
-      setVersionCount(prev => prev + 1);
-      toast.success(`Cambios guardados (v1.${versionCount})`);
+      toast.success(`Cambios guardados (v${data.version})`);
     } catch (error) {
       console.error('Error saving edit:', error);
       toast.error("Error al guardar los cambios", {
@@ -152,6 +152,7 @@ const Dashboard = () => {
       }
 
       const data = await apiResponse.json();
+      setStoryId(data.story_id);
       setGeneratedNarrative(data.narrative || data.story || JSON.stringify(data));
       toast.success("Historia generada correctamente");
     } catch (error) {
