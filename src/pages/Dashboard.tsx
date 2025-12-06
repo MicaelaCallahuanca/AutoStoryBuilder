@@ -17,6 +17,7 @@ const Dashboard = () => {
   const [tono, setTono] = useState<string>("Inspiracional");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedNarrative, setGeneratedNarrative] = useState<string>("");
+  const [currentStoryId, setCurrentStoryId] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedNarrative, setEditedNarrative] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
@@ -84,11 +85,14 @@ const Dashboard = () => {
     setIsSaving(true);
     try {
       const response = await fetch('https://ai-agent-monolitico.onrender.com/save_edit', {
-        method: 'PATCH',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text: editedNarrative }),
+        body: JSON.stringify({ 
+          story_id: currentStoryId,     
+          narrative: editedNarrative    
+        }),
       });
 
       if (!response.ok) {
