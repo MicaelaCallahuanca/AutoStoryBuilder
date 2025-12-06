@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sparkles, Plus, History, Settings, Upload, FileText, ChevronLeft, X, ImagePlus } from "lucide-react";
+import { Sparkles, Plus, History, Settings, Upload, FileText, ChevronLeft, X, ImagePlus, Pencil, Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +17,10 @@ const Dashboard = () => {
   const [tono, setTono] = useState<string>("Inspiracional");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedNarrative, setGeneratedNarrative] = useState<string>("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedNarrative, setEditedNarrative] = useState<string>("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [versionCount, setVersionCount] = useState(1);
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -69,6 +73,40 @@ const Dashboard = () => {
     setUploadedImage(null);
     setUploadedFile(null);
     setImageError("");
+  };
+
+  const handleEditClick = () => {
+    setEditedNarrative(generatedNarrative);
+    setIsEditing(true);
+  };
+
+  const handleSaveEdit = async () => {
+    setIsSaving(true);
+    try {
+      const response = await fetch('https://ai-agent-monolitico.onrender.com/save_edit', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: editedNarrative }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al guardar');
+      }
+
+      setGeneratedNarrative(editedNarrative);
+      setIsEditing(false);
+      setVersionCount(prev => prev + 1);
+      toast.success(`Cambios guardados (v1.${versionCount})`);
+    } catch (error) {
+      console.error('Error saving edit:', error);
+      toast.error("Error al guardar los cambios", {
+        description: "Intenta de nuevo más tarde"
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleGenerateStory = async () => {
@@ -379,12 +417,53 @@ const Dashboard = () => {
 
                   {/* Sección de Resultado */}
                   <div className="rounded-xl border border-subtle bg-card p-8">
-                    <h3 className="text-sm font-medium mb-6">Narrativa generada</h3>
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-sm font-medium">Narrativa generada</h3>
+                      {generatedNarrative && !isEditing && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleEditClick}
+                          className="gap-2"
+                        >
+                          <Pencil className="w-4 h-4" />
+                          Editar
+                        </Button>
+                      )}
+                      {isEditing && (
+                        <Button
+                          size="sm"
+                          onClick={handleSaveEdit}
+                          disabled={isSaving}
+                          className="gap-2"
+                        >
+                          {isSaving ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              Guardando...
+                            </>
+                          ) : (
+                            <>
+                              <Save className="w-4 h-4" />
+                              Guardar cambios
+                            </>
+                          )}
+                        </Button>
+                      )}
+                    </div>
                     {generatedNarrative ? (
                       <div className="min-h-[24rem] rounded-lg border border-subtle bg-background p-6">
-                        <div className="prose prose-sm max-w-none text-foreground whitespace-pre-wrap">
-                          {generatedNarrative}
-                        </div>
+                        {isEditing ? (
+                          <textarea
+                            value={editedNarrative}
+                            onChange={(e) => setEditedNarrative(e.target.value)}
+                            className="w-full h-full min-h-[22rem] text-sm bg-transparent resize-none focus:outline-none focus:ring-2 focus:ring-foreground/20 rounded-lg p-2 border border-subtle"
+                          />
+                        ) : (
+                          <div className="prose prose-sm max-w-none text-foreground whitespace-pre-wrap">
+                            {generatedNarrative}
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <div className="h-96 rounded-lg border border-subtle bg-muted/20 flex items-center justify-center">
