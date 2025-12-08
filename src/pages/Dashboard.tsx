@@ -22,7 +22,7 @@ const Dashboard = () => {
   const [originalText, setOriginalText] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
   const [storyId, setStoryId] = useState<string | null>(null);
-  const [versions, setVersions] = useState<Array<{ version: string; narrative: string }>>([]);
+  const [versions, setVersions] = useState<Array<{ story_id: string; major: number; minor: number; narrative: string }>>([]);
   const [isLoadingVersions, setIsLoadingVersions] = useState(false);
 
   // Fetch versions when activeSection changes to 'versiones'
@@ -572,9 +572,9 @@ const Dashboard = () => {
                     </div>
                   ) : (
                     <div className="grid gap-4 md:grid-cols-2">
-                      {versions.map((version, index) => (
+                      {versions.map((version) => (
                         <div
-                          key={index}
+                          key={`${version.story_id}-${version.major}-${version.minor}`}
                           className="rounded-xl border border-subtle bg-card p-6 hover:border-foreground/30 transition-smooth cursor-pointer group"
                           onClick={() => handleSelectVersion(version.narrative)}
                         >
@@ -582,7 +582,7 @@ const Dashboard = () => {
                             <div className="flex items-center gap-2">
                               <Clock className="w-4 h-4 text-muted-foreground" />
                               <span className="text-sm font-semibold">
-                                v{version.version || `1.${index}`}
+                                v{version.major}.{version.minor}
                               </span>
                             </div>
                             <Button
