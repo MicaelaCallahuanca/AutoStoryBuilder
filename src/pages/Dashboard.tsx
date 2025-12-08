@@ -37,7 +37,7 @@ const Dashboard = () => {
 
     setIsExporting(true);
     try {
-      const response = await fetch("https://ai-agent-monolitico.onrender.com/story/export", {
+      const response = await fetch("https://ai-agent-monolitico-1.onrender.com/story/export", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
