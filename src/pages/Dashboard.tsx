@@ -18,7 +18,8 @@ const Dashboard = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedNarrative, setGeneratedNarrative] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
-  const [editedNarrative, setEditedNarrative] = useState<string>("");
+  const [editedText, setEditedText] = useState<string>("");
+  const [originalText, setOriginalText] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
   const [storyId, setStoryId] = useState<string | null>(null);
 
@@ -77,38 +78,45 @@ const Dashboard = () => {
 
   const handleEditClick = () => {
     if (!generatedNarrative) return;
-    setEditedNarrative(generatedNarrative);
+    setOriginalText(generatedNarrative);
+    setEditedText(generatedNarrative);
     setIsEditing(true);
   };
 
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditedText(originalText);
+  };
+
   const handleSaveEdit = async () => {
-    if (!storyId) { /* ... error ... */ return; }
-    console.log("Intentando guardar story_id:", storyId);
     if (!storyId) {
-    toast.error("No hay historia generada para guardar");
-    return;
+      toast.error("No hay historia generada para guardar");
+      return;
     }
+    
+    // Solo guardar si el texto es diferente
+    if (editedText === originalText) {
+      setIsEditing(false);
+      return;
+    }
+
     setIsSaving(true);
     try {
-      const response = await fetch('https://ai-agent-monolitico-1.onrender.com/save_edit', {
-        method: 'POST',
+      await fetch("https://ai-agent-monolitico-1.onrender.com/save_edit", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
-          story_id: storyId,     
-          narrative: editedNarrative,    
+        body: JSON.stringify({
+          story_id: storyId,
+          narrative: editedText,
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('Error al guardar');
-      }
-
-      const data = await response.json();
-      setGeneratedNarrative(editedNarrative);
+      setGeneratedNarrative(editedText);
+      setOriginalText(editedText);
       setIsEditing(false);
-      toast.success(`Cambios guardados (v${data.version})`);
+      toast.success("Cambios guardados correctamente");
     } catch (error) {
       console.error('Error saving edit:', error);
       toast.error("Error al guardar los cambios", {
@@ -160,8 +168,10 @@ const Dashboard = () => {
       const data = await apiResponse.json();
       if (!data.story_id) throw new Error("El backend no devolvió story_id");
       setStoryId(data.story_id);
-      setGeneratedNarrative(data.narrative || data.story || "");
-      setEditedNarrative(data.narrative || data.story || "");
+      const narrativeText = data.narrative || data.story || "";
+      setGeneratedNarrative(narrativeText);
+      setOriginalText(narrativeText);
+      setEditedText(narrativeText);
       setIsEditing(false);
       toast.success("Historia generada correctamente");
     } catch (error) {
@@ -445,32 +455,42 @@ const Dashboard = () => {
                         </Button>
                       )}
                       {isEditing && (
-                        <Button
-                          size="sm"
-                          onClick={handleSaveEdit}
-                          disabled={isSaving}
-                          className="gap-2"
-                        >
-                          {isSaving ? (
-                            <>
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                              Guardando...
-                            </>
-                          ) : (
-                            <>
-                              <Save className="w-4 h-4" />
-                              Guardar cambios
-                            </>
-                          )}
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleCancelEdit}
+                            disabled={isSaving}
+                          >
+                            Cancelar
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={handleSaveEdit}
+                            disabled={isSaving}
+                            className="gap-2"
+                          >
+                            {isSaving ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                Guardando...
+                              </>
+                            ) : (
+                              <>
+                                <Save className="w-4 h-4" />
+                                Guardar cambios
+                              </>
+                            )}
+                          </Button>
+                        </div>
                       )}
                     </div>
                     {generatedNarrative ? (
                       <div className="min-h-[24rem] rounded-lg border border-subtle bg-background p-6">
                         {isEditing ? (
                           <textarea
-                            value={editedNarrative}
-                            onChange={(e) => setEditedNarrative(e.target.value)}
+                            value={editedText}
+                            onChange={(e) => setEditedText(e.target.value)}
                             className="w-full h-full min-h-[22rem] text-sm bg-transparent resize-none focus:outline-none focus:ring-2 focus:ring-foreground/20 rounded-lg p-2 border border-subtle"
                           />
                         ) : (
