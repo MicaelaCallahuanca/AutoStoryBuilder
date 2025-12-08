@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Sparkles, Plus, History, Settings, Upload, FileText, ChevronLeft, X, ImagePlus, Pencil, Save, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Sparkles, Plus, History, Settings, Upload, FileText, ChevronLeft, X, ImagePlus, Pencil, Save, Loader2, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
@@ -22,6 +22,43 @@ const Dashboard = () => {
   const [originalText, setOriginalText] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
   const [storyId, setStoryId] = useState<string | null>(null);
+  const [versions, setVersions] = useState<Array<{ version: string; narrative: string }>>([]);
+  const [isLoadingVersions, setIsLoadingVersions] = useState(false);
+
+  // Fetch versions when activeSection changes to 'versiones'
+  useEffect(() => {
+    const fetchVersions = async () => {
+      if (activeSection !== 'versiones') return;
+      if (!storyId) {
+        setVersions([]);
+        return;
+      }
+
+      setIsLoadingVersions(true);
+      try {
+        const response = await fetch(`https://ai-agent-monolitico-1.onrender.com/story/${storyId}/versions`);
+        if (!response.ok) throw new Error('Error fetching versions');
+        const data = await response.json();
+        setVersions(data.versions || data || []);
+      } catch (error) {
+        console.error('Error fetching versions:', error);
+        toast.error("Error al cargar las versiones");
+        setVersions([]);
+      } finally {
+        setIsLoadingVersions(false);
+      }
+    };
+
+    fetchVersions();
+  }, [activeSection, storyId]);
+
+  const handleSelectVersion = (narrative: string) => {
+    setGeneratedNarrative(narrative);
+    setEditedText(narrative);
+    setOriginalText(narrative);
+    setActiveSection('nueva');
+    toast.success("Versión cargada correctamente");
+  };
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -512,13 +549,58 @@ const Dashboard = () => {
 
               {activeSection === 'versiones' && (
                 <div className="space-y-4">
-                  <div className="rounded-xl border border-subtle bg-card p-12 text-center">
-                    <History className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50" />
-                    <h3 className="text-lg font-semibold mb-2">No hay versiones guardadas</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Tus historias generadas aparecerán aquí
-                    </p>
-                  </div>
+                  {!storyId ? (
+                    <div className="rounded-xl border border-subtle bg-card p-12 text-center">
+                      <History className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50" />
+                      <h3 className="text-lg font-semibold mb-2">No hay historia generada</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Todavía no generaste ninguna historia para mostrar versiones.
+                      </p>
+                    </div>
+                  ) : isLoadingVersions ? (
+                    <div className="rounded-xl border border-subtle bg-card p-12 text-center">
+                      <Loader2 className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50 animate-spin" />
+                      <p className="text-sm text-muted-foreground">Cargando versiones...</p>
+                    </div>
+                  ) : versions.length === 0 ? (
+                    <div className="rounded-xl border border-subtle bg-card p-12 text-center">
+                      <History className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50" />
+                      <h3 className="text-lg font-semibold mb-2">No hay versiones guardadas</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Las versiones de tu historia aparecerán aquí
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {versions.map((version, index) => (
+                        <div
+                          key={index}
+                          className="rounded-xl border border-subtle bg-card p-6 hover:border-foreground/30 transition-smooth cursor-pointer group"
+                          onClick={() => handleSelectVersion(version.narrative)}
+                        >
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-2">
+                              <Clock className="w-4 h-4 text-muted-foreground" />
+                              <span className="text-sm font-semibold">
+                                v{version.version || `1.${index}`}
+                              </span>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 transition-smooth"
+                            >
+                              Seleccionar
+                            </Button>
+                          </div>
+                          <p className="text-sm text-muted-foreground line-clamp-3">
+                            {version.narrative?.substring(0, 150)}
+                            {version.narrative?.length > 150 && '...'}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
