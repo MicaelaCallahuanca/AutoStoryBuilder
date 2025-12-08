@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import { Sparkles, Plus, History, Settings, Upload, FileText, ChevronLeft, X, ImagePlus, Pencil, Save, Loader2, Clock } from "lucide-react";
+import { Sparkles, Plus, History, Settings, Upload, FileText, ChevronLeft, X, ImagePlus, Pencil, Save, Loader2, Clock, Download } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
@@ -24,6 +30,46 @@ const Dashboard = () => {
   const [storyId, setStoryId] = useState<string | null>(null);
   const [versions, setVersions] = useState<Array<{ story_id: string; major: number; minor: number; narrative: string }>>([]);
   const [isLoadingVersions, setIsLoadingVersions] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = async (format: "PDF" | "HTML") => {
+    if (!generatedNarrative) return;
+
+    setIsExporting(true);
+    try {
+      const response = await fetch("https://ai-agent-monolitico.onrender.com/story/export", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          narrative: generatedNarrative,
+          format: format,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Error al exportar");
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = format === "PDF" ? "story_export.pdf" : "story_export.html";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast.success(`Exportación ${format} completada`);
+    } catch (error) {
+      console.error("Error exporting:", error);
+      toast.error("Error al exportar", {
+        description: "Intenta de nuevo más tarde",
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   // Fetch versions when activeSection changes to 'versiones'
   useEffect(() => {
@@ -481,15 +527,42 @@ const Dashboard = () => {
                     <div className="flex items-center justify-between mb-6">
                       <h3 className="text-sm font-medium">Narrativa generada</h3>
                       {generatedNarrative && !isEditing && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleEditClick}
-                          className="gap-2"
-                        >
-                          <Pencil className="w-4 h-4" />
-                          Editar
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleEditClick}
+                            className="gap-2"
+                          >
+                            <Pencil className="w-4 h-4" />
+                            Editar
+                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={isExporting}
+                                className="gap-2"
+                              >
+                                {isExporting ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Download className="w-4 h-4" />
+                                )}
+                                Exportar
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-card border border-subtle">
+                              <DropdownMenuItem onClick={() => handleExport("PDF")} className="cursor-pointer">
+                                Exportar como PDF
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleExport("HTML")} className="cursor-pointer">
+                                Exportar como HTML
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       )}
                       {isEditing && (
                         <div className="flex gap-2">
