@@ -82,13 +82,15 @@ const Dashboard = () => {
   };
 
   const handleSaveEdit = async () => {
+    if (!storyId) { /* ... error ... */ return; }
+    console.log("Intentando guardar story_id:", storyId);
     if (!storyId) {
     toast.error("No hay historia generada para guardar");
     return;
     }
     setIsSaving(true);
     try {
-      const response = await fetch('https://ai-agent-monolitico.onrender.com/save_edit', {
+      const response = await fetch('https://ai-agent-monolitico-1.onrender.com/save_edit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -146,7 +148,7 @@ const Dashboard = () => {
       formData.append('tono', tono);
       formData.append('formato', formato);
 
-      const apiResponse = await fetch('https://ai-agent-monolitico.onrender.com/story', {
+      const apiResponse = await fetch('https://ai-agent-monolitico-1.onrender.com/story', {
         method: 'POST',
         body: formData,
       });
