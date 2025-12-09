@@ -839,7 +839,7 @@ const Dashboard = () => {
       {showScrollTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-6 left-6 z-50 p-3 rounded-full bg-primary text-primary-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200"
+          className="fixed bottom-6 right-6 z-50 p-3 rounded-xl bg-card border border-border/50 text-muted-foreground shadow-md hover:shadow-lg hover:bg-muted/50 hover:text-foreground transition-all duration-200"
           aria-label="Volver arriba"
         >
           <ArrowUp className="w-5 h-5" />
