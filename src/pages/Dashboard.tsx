@@ -33,7 +33,6 @@ const Dashboard = () => {
   const [versions, setVersions] = useState<Array<{ story_id: string; major: number; minor: number; narrative: string }>>([]);
   const [isLoadingVersions, setIsLoadingVersions] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-  const [selectedExportFormat, setSelectedExportFormat] = useState<"PDF" | "HTML">("PDF");
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   // Handle scroll to show/hide scroll-to-top button
@@ -680,7 +679,6 @@ const Dashboard = () => {
                       )}
                     </div>
                     {generatedNarrative ? (
-                      <div className="space-y-4">
                         <div className="min-h-[22rem] rounded-xl border border-border/50 bg-background p-5">
                           {isEditing ? (
                             <textarea
@@ -694,30 +692,6 @@ const Dashboard = () => {
                             </div>
                           )}
                         </div>
-                        
-                        {/* Export format selector */}
-                        {!isEditing && (
-                          <div className="flex items-center gap-3 pt-2">
-                            <span className="text-xs font-medium text-muted-foreground">Exportar como:</span>
-                            <div className="flex gap-2">
-                              {(['PDF', 'HTML'] as const).map((format) => (
-                                <button
-                                  key={format}
-                                  onClick={() => setSelectedExportFormat(format)}
-                                  className={cn(
-                                    "px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200",
-                                    selectedExportFormat === format
-                                      ? "bg-primary text-primary-foreground shadow-sm"
-                                      : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                                  )}
-                                >
-                                  {format}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
                     ) : (
                       <div className="h-80 rounded-xl border border-border/50 bg-muted/10 flex items-center justify-center">
                         <p className="text-sm text-muted-foreground">
