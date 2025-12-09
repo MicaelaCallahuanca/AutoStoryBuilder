@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Sparkles, Plus, History, Settings, Upload, FileText, ChevronLeft, X, ImagePlus, Pencil, Save, Loader2, Clock, Download } from "lucide-react";
+import { Sparkles, Plus, History, Settings, ChevronLeft, X, ImagePlus, Pencil, Save, Loader2, Clock, Download, Menu, ArrowUp } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +14,7 @@ import { toast } from "sonner";
 const Dashboard = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<'nueva' | 'versiones' | 'ajustes'>('nueva');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -21,6 +22,7 @@ const Dashboard = () => {
   const [ideaCentral, setIdeaCentral] = useState<string>("");
   const [formato, setFormato] = useState<string>("Storytelling de impacto");
   const [tono, setTono] = useState<string>("Inspiracional");
+  const [idioma, setIdioma] = useState<string>("español");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedNarrative, setGeneratedNarrative] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
@@ -31,6 +33,37 @@ const Dashboard = () => {
   const [versions, setVersions] = useState<Array<{ story_id: string; major: number; minor: number; narrative: string }>>([]);
   const [isLoadingVersions, setIsLoadingVersions] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [selectedExportFormat, setSelectedExportFormat] = useState<"PDF" | "HTML">("PDF");
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Handle scroll to show/hide scroll-to-top button
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleNewStory = () => {
+    // Reset all fields
+    setUploadedImage(null);
+    setUploadedFile(null);
+    setImageError("");
+    setIdeaCentral("");
+    setTono("Inspiracional");
+    setFormato("Storytelling de impacto");
+    setGeneratedNarrative("");
+    setEditedText("");
+    setOriginalText("");
+    setIsEditing(false);
+    setStoryId(null);
+    setActiveSection('nueva');
+  };
 
   const handleExport = async (format: "PDF" | "HTML") => {
     if (!generatedNarrative) return;
@@ -199,7 +232,17 @@ const Dashboard = () => {
       setGeneratedNarrative(editedText);
       setOriginalText(editedText);
       setIsEditing(false);
-      toast.success("Cambios guardados correctamente");
+      toast.success(
+        <div className="flex items-center gap-2">
+          <span>Cambios guardados correctamente.</span>
+          <button
+            onClick={() => setActiveSection('versiones')}
+            className="text-primary underline hover:no-underline font-medium"
+          >
+            Ver versiones
+          </button>
+        </div>
+      );
     } catch (error) {
       console.error('Error saving edit:', error);
       toast.error("Error al guardar los cambios", {
@@ -270,75 +313,113 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-subtle bg-muted/30 flex flex-col">
-        <div className="p-6 border-b border-subtle">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5" />
-            <span className="font-semibold text-lg">StoryGen AI</span>
+      <aside 
+        className={cn(
+          "border-r border-border/50 bg-muted/20 flex flex-col transition-all duration-300 ease-in-out",
+          sidebarCollapsed ? "w-16" : "w-64"
+        )}
+      >
+        {/* Logo & Toggle */}
+        <div className="p-4 border-b border-border/50">
+          <div className="flex items-center justify-between gap-2">
+            <a
+              href="https://auto-story-builder-one.vercel.app/"
+              className={cn(
+                "flex items-center gap-2 transition-all duration-300",
+                sidebarCollapsed ? "justify-center" : ""
+              )}
+            >
+              <div className={cn(
+                "flex items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20",
+                sidebarCollapsed ? "w-10 h-10" : "w-12 h-12"
+              )}>
+                <Sparkles className={cn("text-primary", sidebarCollapsed ? "w-5 h-5" : "w-6 h-6")} />
+              </div>
+              {!sidebarCollapsed && (
+                <span className="font-semibold text-base tracking-tight">AutoStory</span>
+              )}
+            </a>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "h-8 w-8 rounded-lg hover:bg-muted/50 transition-colors",
+                sidebarCollapsed && "absolute left-4 top-4"
+              )}
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            >
+              <Menu className="w-4 h-4" />
+            </Button>
           </div>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-3 space-y-1">
           <button
-            onClick={() => setActiveSection('nueva')}
+            onClick={handleNewStory}
             className={cn(
-              "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-smooth",
+              "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
               activeSection === 'nueva' 
-                ? "bg-background text-foreground shadow-sm" 
-                : "text-muted-foreground hover:bg-background/50"
+                ? "bg-background text-foreground shadow-sm border border-border/50" 
+                : "text-muted-foreground hover:bg-background/60 hover:text-foreground",
+              sidebarCollapsed && "justify-center px-2"
             )}
           >
-            <Plus className="w-4 h-4" />
-            Nueva historia
+            <Plus className="w-4 h-4 shrink-0" />
+            {!sidebarCollapsed && <span>Nueva historia</span>}
           </button>
           
           <button
             onClick={() => setActiveSection('versiones')}
             className={cn(
-              "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-smooth",
+              "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
               activeSection === 'versiones' 
-                ? "bg-background text-foreground shadow-sm" 
-                : "text-muted-foreground hover:bg-background/50"
+                ? "bg-background text-foreground shadow-sm border border-border/50" 
+                : "text-muted-foreground hover:bg-background/60 hover:text-foreground",
+              sidebarCollapsed && "justify-center px-2"
             )}
           >
-            <History className="w-4 h-4" />
-            Mis versiones
+            <History className="w-4 h-4 shrink-0" />
+            {!sidebarCollapsed && <span>Mis versiones</span>}
           </button>
           
           <button
             onClick={() => setActiveSection('ajustes')}
             className={cn(
-              "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-smooth",
+              "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
               activeSection === 'ajustes' 
-                ? "bg-background text-foreground shadow-sm" 
-                : "text-muted-foreground hover:bg-background/50"
+                ? "bg-background text-foreground shadow-sm border border-border/50" 
+                : "text-muted-foreground hover:bg-background/60 hover:text-foreground",
+              sidebarCollapsed && "justify-center px-2"
             )}
           >
-            <Settings className="w-4 h-4" />
-            Ajustes
+            <Settings className="w-4 h-4 shrink-0" />
+            {!sidebarCollapsed && <span>Ajustes</span>}
           </button>
         </nav>
 
-        <div className="p-4 border-t border-subtle">
+        <div className="p-3 border-t border-border/50">
           <Button 
             variant="ghost" 
             size="sm" 
-            className="w-full justify-start gap-2"
+            className={cn(
+              "w-full gap-2 rounded-xl hover:bg-muted/50 transition-colors",
+              sidebarCollapsed ? "justify-center px-2" : "justify-start"
+            )}
             onClick={() => navigate('/')}
           >
-            <ChevronLeft className="w-4 h-4" />
-            Volver al inicio
+            <ChevronLeft className="w-4 h-4 shrink-0" />
+            {!sidebarCollapsed && <span>Volver al inicio</span>}
           </Button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="border-b border-subtle bg-background/80 backdrop-blur-sm sticky top-0 z-10">
-          <div className="px-8 py-6">
+        <header className="border-b border-border/50 bg-background/90 backdrop-blur-md sticky top-0 z-10">
+          <div className="px-6 lg:px-8 py-5">
             <div className="max-w-5xl mx-auto">
-              <h1 className="text-2xl font-semibold mb-2">
+              <h1 className="text-xl lg:text-2xl font-semibold mb-1.5 tracking-tight">
                 {activeSection === 'nueva' && 'Nueva historia visual'}
                 {activeSection === 'versiones' && 'Mis versiones'}
                 {activeSection === 'ajustes' && 'Ajustes'}
@@ -354,19 +435,21 @@ const Dashboard = () => {
 
         {/* Content Area */}
         <div className="flex-1 overflow-auto">
-          <div className="px-8 py-8">
-            <div className="max-w-5xl mx-auto space-y-8">
+          <div className="px-6 lg:px-8 py-6 lg:py-8">
+            <div className="max-w-5xl mx-auto space-y-6">
               {activeSection === 'nueva' && (
                 <>
                   {/* Sección superior – Subida de imagen */}
-                  <div className="rounded-xl border border-subtle bg-card p-8">
-                    <h3 className="text-sm font-medium mb-6">Subir imagen (opcional)</h3>
+                  <div className="rounded-2xl border border-border/50 bg-card p-6 lg:p-8 shadow-sm">
+                    <h3 className="text-sm font-medium mb-5 text-foreground/90">Subir imagen (opcional)</h3>
                     
                     {!uploadedImage ? (
                       <div
                         className={cn(
-                          "relative h-48 rounded-lg border-2 border-dashed transition-smooth flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-foreground/30 hover:bg-muted/30",
-                          dragActive ? "border-foreground bg-muted/40" : "border-subtle bg-muted/20",
+                          "relative h-44 rounded-xl border-2 border-dashed transition-all duration-200 flex flex-col items-center justify-center gap-3 cursor-pointer",
+                          dragActive 
+                            ? "border-primary/50 bg-primary/5" 
+                            : "border-border/60 bg-muted/10 hover:border-primary/30 hover:bg-muted/20",
                           imageError && "border-destructive/50"
                         )}
                         onDragEnter={handleDrag}
@@ -375,9 +458,9 @@ const Dashboard = () => {
                         onDrop={handleDrop}
                         onClick={() => document.getElementById('image-upload')?.click()}
                       >
-                        <ImagePlus className="w-10 h-10 text-muted-foreground/50" />
+                        <ImagePlus className="w-10 h-10 text-muted-foreground/40" />
                         <div className="text-center">
-                          <p className="text-sm text-foreground/70 mb-1">
+                          <p className="text-sm text-foreground/60 mb-1">
                             Sube una imagen (opcional)
                           </p>
                           <p className="text-xs text-muted-foreground">
@@ -393,7 +476,7 @@ const Dashboard = () => {
                         />
                       </div>
                     ) : (
-                      <div className="relative h-48 rounded-lg overflow-hidden bg-muted/20 border border-subtle">
+                      <div className="relative h-44 rounded-xl overflow-hidden bg-muted/10 border border-border/50">
                         <img 
                           src={uploadedImage} 
                           alt="Preview" 
@@ -402,7 +485,7 @@ const Dashboard = () => {
                         <Button
                           variant="destructive"
                           size="icon"
-                          className="absolute top-2 right-2 h-8 w-8"
+                          className="absolute top-3 right-3 h-8 w-8 rounded-lg shadow-md"
                           onClick={removeImage}
                         >
                           <X className="w-4 h-4" />
@@ -416,26 +499,26 @@ const Dashboard = () => {
                   </div>
 
                   {/* Sección inferior – Texto + opciones */}
-                  <div className="rounded-xl border border-subtle bg-card p-8">
-                    <h3 className="text-sm font-medium mb-6">Idea central y configuración</h3>
+                  <div className="rounded-2xl border border-border/50 bg-card p-6 lg:p-8 shadow-sm">
+                    <h3 className="text-sm font-medium mb-5 text-foreground/90">Idea central y configuración</h3>
                     
-                    <div className="space-y-6">
+                    <div className="space-y-5">
                       {/* Textarea para idea central */}
                       <div>
-                        <label className="text-xs font-medium text-foreground/70 mb-2 block">
+                        <label className="text-xs font-medium text-muted-foreground mb-2 block">
                           Idea central (opcional)
                         </label>
                         <textarea
                           value={ideaCentral}
                           onChange={(e) => setIdeaCentral(e.target.value)}
                           placeholder="Describe la idea principal de tu historia..."
-                          className="w-full min-h-[120px] px-4 py-3 rounded-lg border border-subtle bg-background text-sm resize-none focus:outline-none focus:ring-2 focus:ring-foreground/20 transition-smooth"
+                          className="w-full min-h-[110px] px-4 py-3 rounded-xl border border-border/50 bg-background text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all duration-200 placeholder:text-muted-foreground/50"
                         />
                       </div>
 
                       {/* Selector de Formato */}
                       <div>
-                        <label className="text-xs font-medium text-foreground/70 mb-3 block">
+                        <label className="text-xs font-medium text-muted-foreground mb-3 block">
                           Formato <span className="text-destructive">*</span>
                         </label>
                         <div className="space-y-2">
@@ -447,10 +530,10 @@ const Dashboard = () => {
                             <label
                               key={option.value}
                               className={cn(
-                                "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-smooth",
+                                "flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all duration-200",
                                 formato === option.value
-                                  ? "border-foreground bg-muted/30"
-                                  : "border-subtle hover:bg-muted/20"
+                                  ? "border-primary/40 bg-primary/5 shadow-sm"
+                                  : "border-border/50 hover:bg-muted/20 hover:border-border"
                               )}
                             >
                               <input
@@ -459,7 +542,7 @@ const Dashboard = () => {
                                 value={option.value}
                                 checked={formato === option.value}
                                 onChange={(e) => setFormato(e.target.value)}
-                                className="w-4 h-4"
+                                className="w-4 h-4 accent-primary"
                               />
                               <span className="text-sm">{option.label}</span>
                             </label>
@@ -469,7 +552,7 @@ const Dashboard = () => {
 
                       {/* Selector de Tono */}
                       <div>
-                        <label className="text-xs font-medium text-foreground/70 mb-3 block">
+                        <label className="text-xs font-medium text-muted-foreground mb-3 block">
                           Tono <span className="text-destructive">*</span>
                         </label>
                         <div className="space-y-2">
@@ -481,10 +564,10 @@ const Dashboard = () => {
                             <label
                               key={option.value}
                               className={cn(
-                                "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-smooth",
+                                "flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all duration-200",
                                 tono === option.value
-                                  ? "border-foreground bg-muted/30"
-                                  : "border-subtle hover:bg-muted/20"
+                                  ? "border-primary/40 bg-primary/5 shadow-sm"
+                                  : "border-border/50 hover:bg-muted/20 hover:border-border"
                               )}
                             >
                               <input
@@ -493,7 +576,7 @@ const Dashboard = () => {
                                 value={option.value}
                                 checked={tono === option.value}
                                 onChange={(e) => setTono(e.target.value)}
-                                className="w-4 h-4"
+                                className="w-4 h-4 accent-primary"
                               />
                               <span className="text-sm">{option.label}</span>
                             </label>
@@ -502,16 +585,16 @@ const Dashboard = () => {
                       </div>
 
                       {/* Generate Button */}
-                      <div className="pt-4">
+                      <div className="pt-3">
                         <Button
                           onClick={handleGenerateStory}
                           disabled={isGenerating}
-                          className="w-full"
+                          className="w-full rounded-xl h-11 text-sm font-medium shadow-sm"
                           size="lg"
                         >
                           {isGenerating ? (
                             <>
-                              <span className="animate-spin mr-2">⏳</span>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                               Generando...
                             </>
                           ) : (
@@ -523,16 +606,16 @@ const Dashboard = () => {
                   </div>
 
                   {/* Sección de Resultado */}
-                  <div className="rounded-xl border border-subtle bg-card p-8">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-sm font-medium">Narrativa generada</h3>
+                  <div className="rounded-2xl border border-border/50 bg-card p-6 lg:p-8 shadow-sm">
+                    <div className="flex items-center justify-between mb-5">
+                      <h3 className="text-sm font-medium text-foreground/90">Narrativa generada</h3>
                       {generatedNarrative && !isEditing && (
                         <div className="flex gap-2">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={handleEditClick}
-                            className="gap-2"
+                            className="gap-2 rounded-lg border-border/50 hover:bg-muted/50"
                           >
                             <Pencil className="w-4 h-4" />
                             Editar
@@ -543,7 +626,7 @@ const Dashboard = () => {
                                 variant="outline"
                                 size="sm"
                                 disabled={isExporting}
-                                className="gap-2"
+                                className="gap-2 rounded-lg border-border/50 hover:bg-muted/50"
                               >
                                 {isExporting ? (
                                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -553,11 +636,11 @@ const Dashboard = () => {
                                 Exportar
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="bg-card border border-subtle">
-                              <DropdownMenuItem onClick={() => handleExport("PDF")} className="cursor-pointer">
+                            <DropdownMenuContent align="end" className="bg-card border border-border/50 rounded-xl shadow-lg">
+                              <DropdownMenuItem onClick={() => handleExport("PDF")} className="cursor-pointer rounded-lg">
                                 Exportar como PDF
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleExport("HTML")} className="cursor-pointer">
+                              <DropdownMenuItem onClick={() => handleExport("HTML")} className="cursor-pointer rounded-lg">
                                 Exportar como HTML
                               </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -571,6 +654,7 @@ const Dashboard = () => {
                             size="sm"
                             onClick={handleCancelEdit}
                             disabled={isSaving}
+                            className="rounded-lg border-border/50"
                           >
                             Cancelar
                           </Button>
@@ -578,7 +662,7 @@ const Dashboard = () => {
                             size="sm"
                             onClick={handleSaveEdit}
                             disabled={isSaving}
-                            className="gap-2"
+                            className="gap-2 rounded-lg"
                           >
                             {isSaving ? (
                               <>
@@ -596,21 +680,46 @@ const Dashboard = () => {
                       )}
                     </div>
                     {generatedNarrative ? (
-                      <div className="min-h-[24rem] rounded-lg border border-subtle bg-background p-6">
-                        {isEditing ? (
-                          <textarea
-                            value={editedText}
-                            onChange={(e) => setEditedText(e.target.value)}
-                            className="w-full h-full min-h-[22rem] text-sm bg-transparent resize-none focus:outline-none focus:ring-2 focus:ring-foreground/20 rounded-lg p-2 border border-subtle"
-                          />
-                        ) : (
-                          <div className="prose prose-sm max-w-none text-foreground whitespace-pre-wrap">
-                            {generatedNarrative}
+                      <div className="space-y-4">
+                        <div className="min-h-[22rem] rounded-xl border border-border/50 bg-background p-5">
+                          {isEditing ? (
+                            <textarea
+                              value={editedText}
+                              onChange={(e) => setEditedText(e.target.value)}
+                              className="w-full h-full min-h-[20rem] text-sm bg-transparent resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 rounded-lg p-2"
+                            />
+                          ) : (
+                            <div className="prose prose-sm max-w-none text-foreground/90 whitespace-pre-wrap leading-relaxed">
+                              {generatedNarrative}
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Export format selector */}
+                        {!isEditing && (
+                          <div className="flex items-center gap-3 pt-2">
+                            <span className="text-xs font-medium text-muted-foreground">Exportar como:</span>
+                            <div className="flex gap-2">
+                              {(['PDF', 'HTML'] as const).map((format) => (
+                                <button
+                                  key={format}
+                                  onClick={() => setSelectedExportFormat(format)}
+                                  className={cn(
+                                    "px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200",
+                                    selectedExportFormat === format
+                                      ? "bg-primary text-primary-foreground shadow-sm"
+                                      : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                                  )}
+                                >
+                                  {format}
+                                </button>
+                              ))}
+                            </div>
                           </div>
                         )}
                       </div>
                     ) : (
-                      <div className="h-96 rounded-lg border border-subtle bg-muted/20 flex items-center justify-center">
+                      <div className="h-80 rounded-xl border border-border/50 bg-muted/10 flex items-center justify-center">
                         <p className="text-sm text-muted-foreground">
                           La narrativa generada aparecerá aquí
                         </p>
@@ -623,21 +732,21 @@ const Dashboard = () => {
               {activeSection === 'versiones' && (
                 <div className="space-y-4">
                   {!storyId ? (
-                    <div className="rounded-xl border border-subtle bg-card p-12 text-center">
-                      <History className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50" />
+                    <div className="rounded-2xl border border-border/50 bg-card p-12 text-center shadow-sm">
+                      <History className="w-12 h-12 mx-auto mb-4 text-muted-foreground/40" />
                       <h3 className="text-lg font-semibold mb-2">No hay historia generada</h3>
                       <p className="text-sm text-muted-foreground">
                         Todavía no generaste ninguna historia para mostrar versiones.
                       </p>
                     </div>
                   ) : isLoadingVersions ? (
-                    <div className="rounded-xl border border-subtle bg-card p-12 text-center">
-                      <Loader2 className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50 animate-spin" />
+                    <div className="rounded-2xl border border-border/50 bg-card p-12 text-center shadow-sm">
+                      <Loader2 className="w-12 h-12 mx-auto mb-4 text-muted-foreground/40 animate-spin" />
                       <p className="text-sm text-muted-foreground">Cargando versiones...</p>
                     </div>
                   ) : versions.length === 0 ? (
-                    <div className="rounded-xl border border-subtle bg-card p-12 text-center">
-                      <History className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50" />
+                    <div className="rounded-2xl border border-border/50 bg-card p-12 text-center shadow-sm">
+                      <History className="w-12 h-12 mx-auto mb-4 text-muted-foreground/40" />
                       <h3 className="text-lg font-semibold mb-2">No hay versiones guardadas</h3>
                       <p className="text-sm text-muted-foreground">
                         Las versiones de tu historia aparecerán aquí
@@ -648,10 +757,10 @@ const Dashboard = () => {
                       {versions.map((version) => (
                         <div
                           key={`${version.story_id}-${version.major}-${version.minor}`}
-                          className="rounded-xl border border-subtle bg-card p-6 hover:border-foreground/30 transition-smooth cursor-pointer group"
+                          className="rounded-2xl border border-border/50 bg-card p-5 hover:border-primary/30 hover:shadow-md transition-all duration-200 cursor-pointer group"
                           onClick={() => handleSelectVersion(version.narrative)}
                         >
-                          <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2">
                               <Clock className="w-4 h-4 text-muted-foreground" />
                               <span className="text-sm font-semibold">
@@ -661,12 +770,12 @@ const Dashboard = () => {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="opacity-0 group-hover:opacity-100 transition-smooth"
+                              className="opacity-0 group-hover:opacity-100 transition-all duration-200 rounded-lg"
                             >
                               Seleccionar
                             </Button>
                           </div>
-                          <p className="text-sm text-muted-foreground line-clamp-3">
+                          <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
                             {version.narrative?.substring(0, 150)}
                             {version.narrative?.length > 150 && '...'}
                           </p>
@@ -679,31 +788,43 @@ const Dashboard = () => {
 
               {activeSection === 'ajustes' && (
                 <div className="space-y-6">
-                  <div className="rounded-xl border border-subtle bg-card p-8 space-y-6">
-                    <div className="space-y-4">
-                      <h3 className="font-semibold">Preferencias generales</h3>
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between py-3 border-b border-subtle">
-                          <div>
-                            <p className="text-sm font-medium">Idioma de salida</p>
-                            <p className="text-xs text-muted-foreground">Idioma para las historias generadas</p>
-                          </div>
-                          <Button variant="outline" size="sm">Español</Button>
-                        </div>
-                        <div className="flex items-center justify-between py-3 border-b border-subtle">
-                          <div>
-                            <p className="text-sm font-medium">Estilo visual</p>
-                            <p className="text-xs text-muted-foreground">Preferencia de diseño</p>
-                          </div>
-                          <Button variant="outline" size="sm">Minimalista</Button>
-                        </div>
-                        <div className="flex items-center justify-between py-3">
-                          <div>
-                            <p className="text-sm font-medium">Formato de exportación</p>
-                            <p className="text-xs text-muted-foreground">Tipo de archivo de salida</p>
-                          </div>
-                          <Button variant="outline" size="sm">PDF</Button>
-                        </div>
+                  <div className="rounded-2xl border border-border/50 bg-card p-6 lg:p-8 shadow-sm space-y-5">
+                    <h3 className="font-semibold text-foreground/90">Preferencias generales</h3>
+                    
+                    {/* Idioma de salida */}
+                    <div className="pt-2">
+                      <label className="text-xs font-medium text-muted-foreground mb-3 block">
+                        Idioma de salida
+                      </label>
+                      <p className="text-xs text-muted-foreground/70 mb-3">
+                        Idioma para las historias generadas
+                      </p>
+                      <div className="space-y-2">
+                        {[
+                          { value: 'español', label: 'Español' },
+                          { value: 'inglés', label: 'Inglés' },
+                          { value: 'portugués', label: 'Portugués' }
+                        ].map((option) => (
+                          <label
+                            key={option.value}
+                            className={cn(
+                              "flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all duration-200",
+                              idioma === option.value
+                                ? "border-primary/40 bg-primary/5 shadow-sm"
+                                : "border-border/50 hover:bg-muted/20 hover:border-border"
+                            )}
+                          >
+                            <input
+                              type="radio"
+                              name="idioma"
+                              value={option.value}
+                              checked={idioma === option.value}
+                              onChange={(e) => setIdioma(e.target.value)}
+                              className="w-4 h-4 accent-primary"
+                            />
+                            <span className="text-sm">{option.label}</span>
+                          </label>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -713,6 +834,17 @@ const Dashboard = () => {
           </div>
         </div>
       </main>
+
+      {/* Scroll to top button */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 left-6 z-50 p-3 rounded-full bg-primary text-primary-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200"
+          aria-label="Volver arriba"
+        >
+          <ArrowUp className="w-5 h-5" />
+        </button>
+      )}
     </div>
   );
 };
