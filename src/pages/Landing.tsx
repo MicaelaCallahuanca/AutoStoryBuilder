@@ -169,14 +169,24 @@ const Landing = () => {
           {/* Mockup */}
           <div className="mt-20 max-w-5xl mx-auto animate-fade-up" style={{ animationDelay: '0.2s' }}>
             <div className="relative aspect-video rounded-2xl border border-border/50 bg-card overflow-hidden card-glow">
-              <div className="absolute inset-0 bg-gradient-to-br from-accent-brand/10 via-background/50 to-background/80" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center space-y-4 p-8">
-                  <div className="w-16 h-16 mx-auto rounded-2xl bg-accent-brand/20 flex items-center justify-center">
-                    <Sparkles className="w-8 h-8 text-accent-brand" />
-                  </div>
-                  <p className="text-sm text-muted-foreground">Vista previa del generador</p>
-                </div>
+              {/* Overlay de degradado, se mantiene */}
+              <div className="absolute inset-0 bg-gradient-to-br from-accent-brand/10 via-background/50 to-background/80 pointer-events-none" />
+              
+              {/* Contenedor del GIF */}
+              <div className="absolute inset-0 flex items-center justify-center p-4">
+                <img
+                  src="https://res.cloudinary.com/micac/image/upload/f_auto,q_auto,c_scale/auto_story_gif_ukn4cb.gif"
+                  alt="Vista previa del generador"
+                  className="w-full h-full object-contain rounded-xl"
+                  loading="lazy"
+                />
+                
+              </div>
+              {/* Título superpuesto, igual que antes pero abajo */}
+              <div className="absolute bottom-4 left-0 right-0 text-center">
+                <p className="text-sm text-muted-foreground drop-shadow-md">
+                  Vista previa del generador
+                </p>
               </div>
             </div>
           </div>
