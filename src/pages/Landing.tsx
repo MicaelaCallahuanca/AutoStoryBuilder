@@ -15,6 +15,7 @@ const Landing = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [flippedCard, setFlippedCard] = useState<number | null>(null);
 
   // Handle scroll to show/hide scroll-to-top button
   useEffect(() => {
@@ -339,28 +340,123 @@ const Landing = () => {
               <p className="text-lg text-muted-foreground">
                 Historias visuales generadas automáticamente a partir de diferentes tipos de contenido
               </p>
+              <p className="text-sm text-muted-foreground/70">
+                Pasa el mouse sobre cada tarjeta para ver la narrativa generada
+              </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              {[1, 2, 3, 4].map((item, index) => (
-                <div 
-                  key={item} 
-                  className="group rounded-2xl border border-border/50 bg-card overflow-hidden hover-lift animate-fade-up card-glow"
+            <div className="grid md:grid-cols-2 gap-8">
+              {[
+                {
+                  id: 1,
+                  image: "/landing/campera.jpg",
+                  title: "Moda / Retail — Storytelling Inspiracional",
+                  userText: "Cada temporada trae una pieza que cuenta una historia.\nEsta campera fue diseñada para acompañar movimiento, no tendencias.\nMateriales reciclados, costuras reforzadas y una caída ligera que abraza sin peso.\nLa colección 2025 llega para recordarnos que vestir también es elegir un mundo posible.",
+                  format: "Storytelling de impacto",
+                  tone: "Inspiracional",
+                  output: "No es solo una campera; es el inicio de una nueva narrativa. Cada temporada, emerge una pieza que trasciende el efímero dictado de la moda. Esta prenda, diseñada para la vida en movimiento, abraza tu ritmo, no las tendencias pasajeras. Confeccionada con la memoria del futuro, sus materiales reciclados y costuras reforzadas prometen una durabilidad que se siente tan ligera como un abrazo sin peso. Es una declaración silenciosa de compromiso, un eco de la convicción. La colección 2025 no solo te viste; te invita a elegir, con cada fibra, un mundo posible. Es tiempo de vestir tus valores."
+                },
+                {
+                  id: 2,
+                  image: "/landing/tech.jpg",
+                  title: "Caso Profesional / Tech — Resumen Técnico",
+                  userText: "Optimicé el flujo de predicción reduciendo el tiempo de inferencia un 32%.\nEl modelo combina XGBoost con validación estratificada y un pipeline robusto sin fuga de datos.\nEste dashboard resume la performance en producción y la trazabilidad del experimento.",
+                  format: "Resumen de caso",
+                  tone: "Técnico",
+                  output: "Se ha completado una optimización integral del flujo de predicción, resultando en una reducción del 32% en el tiempo de inferencia. La solución técnica implementada utiliza un modelo XGBoost, con una validación estratificada rigurosa y un pipeline de procesamiento robusto diseñado para prevenir cualquier fuga de datos. El dashboard de rendimiento en producción valida estas mejoras operativas, reflejando una disminución del TTR de 3.0 a 2.5, un incremento del MRR a 95K y del ACV a 10K. La plataforma ofrece una trazabilidad completa del experimento y una monitorización continua de la performance del sistema, asegurando la robustez y eficacia de la optimización."
+                },
+                {
+                  id: 3,
+                  image: "/landing/comida.jpg",
+                  title: "PyME / Gastronomía — Post Social Educativo",
+                  userText: "Este mes lanzamos un menú renovado con ingredientes de estación.\nCada plato fue rediseñado para potenciar sabor y sustentabilidad.\nTrabajamos con productores locales y técnicas de bajo desperdicio.\nMás sabor, menos huella.",
+                  format: "Post social",
+                  tone: "Educativo",
+                  output: "Este mes, te invitamos a explorar nuestro menú renovado, una propuesta que va más allá del sabor. Hemos reinventado cada plato para destacar los ingredientes de estación, garantizando una frescura y un perfil aromático inigualables. Al elegir productos de temporada, no solo celebramos los ciclos naturales, sino que también aseguramos una mayor calidad y un menor impacto ambiental.\n\nNuestra filosofía de \"más sabor, menos huella\" se materializa en la colaboración con productores locales, lo que reduce las distancias de transporte y apoya a nuestra comunidad. Además, aplicamos técnicas de bajo desperdicio en cada etapa, desde la preparación hasta el emplatado, maximizando el uso de cada ingrediente. Así, cada bocado es una experiencia deliciosa y consciente.\n\nDescubre cómo la buena comida puede ser buena para ti y para el planeta.\n\n#MenúRenovado #SostenibilidadGastronómica #IngredientesDeEstación #CocinaConsciente"
+                },
+                {
+                  id: 4,
+                  image: "/landing/Influencer.jpg",
+                  title: "Marca Personal / Creativa — Storytelling Técnico",
+                  userText: "Soy consultora estratégica enfocada en innovación y diseño organizacional.\nAyudo a profesionales y equipos a clarificar su narrativa, construir propuestas de valor diferenciadas y diseñar experiencias que conecten con propósito.\nLanzaré mi nueva identidad de marca en 2025 y quiero comunicarlo con claridad y profundidad.",
+                  format: "Storytelling de impacto",
+                  tone: "Técnico",
+                  output: "Mi praxis se define como consultoría estratégica avanzada, focalizada en la sinergia entre innovación y diseño organizacional. Implemento marcos metodológicos para capacitar a profesionales y equipos en la clarificación de su narrativa estratégica, la ingeniería de propuestas de valor diferenciadas y la conceptualización de experiencias intrínsecamente conectadas con su propósito fundamental. Este abordaje riguroso habilita una optimización del impacto y la resonancia en entornos dinámicos. En preparación para una recalibración estratégica de mi plataforma, la revelación de mi nueva identidad de marca está programada para 2025. Esta evolución no constituye una mera actualización superficial, sino una articulación deliberada de mi compromiso con la profundidad analítica y la coherencia conceptual, garantizando una comunicación transparente y amplificada de mi propuesta de valor y trayectoria futura en el ámbito de la transformación organizacional."
+                }
+              ].map((example, index) => (
+                <article
+                  key={example.id}
+                  className="group rounded-2xl border border-border/50 bg-card overflow-hidden hover-lift animate-fade-up card-glow cursor-pointer min-h-96 relative transition-all duration-300"
                   style={{ animationDelay: `${index * 0.1}s` }}
+                  onMouseEnter={() => setFlippedCard(example.id)}
+                  onMouseLeave={() => setFlippedCard(null)}
+                  onClick={() => setFlippedCard(flippedCard === example.id ? null : example.id)}
                 >
-                  <div className="aspect-video bg-muted/30 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-accent-brand/10 to-background/80" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <FileText className="w-12 h-12 text-muted-foreground/30" />
+                  {/* Front Side - Imagen y contenido */}
+                  <div
+                    className={cn(
+                      "flex flex-col transition-opacity duration-300 h-full",
+                      flippedCard === example.id
+                        ? "opacity-0 pointer-events-none"
+                        : "opacity-100"
+                    )}
+                  >
+                    {/* Imagen */}
+                    <div className="h-48 bg-muted/30 relative overflow-hidden flex-shrink-0">
+                      <img
+                        src={example.image}
+                        alt={example.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                        role="img"
+                      />
+                    </div>
+
+                    {/* Contenido */}
+                    <div className="p-6 space-y-3 flex flex-col">
+                      {/* Título */}
+                      <h3 className="font-semibold text-base group-hover:text-accent-brand transition-colors leading-snug">
+                        {example.title}
+                      </h3>
+
+                      {/* Texto del usuario - Sin recorte */}
+                      <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                        {example.userText}
+                      </p>
+
+                      {/* Selectores */}
+                      <div className="space-y-2 border-t border-border/50 pt-3 mt-auto">
+                        <div className="flex items-start gap-2">
+                          <span className="text-xs font-medium text-accent-brand/80 flex-shrink-0 pt-0.5">📌</span>
+                          <span className="text-xs text-muted-foreground"><strong>Formato:</strong> {example.format}</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-xs font-medium text-accent-brand/80 flex-shrink-0 pt-0.5">🎛</span>
+                          <span className="text-xs text-muted-foreground"><strong>Tono:</strong> {example.tone}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="p-6 space-y-2">
-                    <h3 className="font-semibold group-hover:text-accent-brand transition-colors">Historia de ejemplo {item}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Narrativa visual generada automáticamente a partir de datos estructurados.
-                    </p>
+
+                  {/* Back Side - Narrativa generada */}
+                  <div
+                    className={cn(
+                      "absolute inset-0 rounded-2xl bg-black/95 p-6 flex flex-col transition-opacity duration-300 overflow-hidden",
+                      flippedCard === example.id
+                        ? "opacity-100"
+                        : "opacity-0 pointer-events-none"
+                    )}
+                  >
+                    <h4 className="text-sm font-semibold text-accent-brand mb-4 flex-shrink-0">
+                      ✨ Narrativa generada
+                    </h4>
+                    <div className="flex-grow overflow-y-auto">
+                      <p className="text-sm text-gray-200 leading-relaxed whitespace-pre-wrap">
+                        {example.output}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                </article>
               ))}
             </div>
           </div>
