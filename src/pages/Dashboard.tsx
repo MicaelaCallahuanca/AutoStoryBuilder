@@ -136,6 +136,14 @@ const Dashboard = () => {
     setOriginalText(narrative);
     setActiveSection('nueva');
     toast.success("Versión cargada correctamente");
+    
+    // Scroll to narrative section after a brief delay
+    setTimeout(() => {
+      const narrativeSection = document.getElementById('narrativa-generada');
+      if (narrativeSection) {
+        narrativeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
 
   const handleDrag = (e: React.DragEvent) => {
@@ -605,7 +613,7 @@ const Dashboard = () => {
                   </div>
 
                   {/* Sección de Resultado */}
-                  <div className="rounded-2xl border border-border/50 bg-card p-6 lg:p-8 shadow-sm">
+                  <div id="narrativa-generada" className="rounded-2xl border border-border/50 bg-card p-6 lg:p-8 shadow-sm scroll-mt-24">
                     <div className="flex items-center justify-between mb-5">
                       <h3 className="text-sm font-medium text-foreground/90">Narrativa generada</h3>
                       {generatedNarrative && !isEditing && (
@@ -809,16 +817,19 @@ const Dashboard = () => {
         </div>
       </main>
 
-      {/* Scroll to top button */}
-      {showScrollTop && (
-        <button
-          onClick={scrollToTop}
-          className="fixed bottom-6 right-6 z-50 p-3 rounded-xl bg-card border border-border/50 text-muted-foreground shadow-md hover:shadow-lg hover:bg-muted/50 hover:text-foreground transition-all duration-200"
-          aria-label="Volver arriba"
-        >
-          <ArrowUp className="w-5 h-5" />
-        </button>
-      )}
+      {/* Scroll to top button - YouTube Music style */}
+      <button
+        onClick={scrollToTop}
+        className={cn(
+          "fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-foreground text-background shadow-lg flex items-center justify-center transition-all duration-300",
+          showScrollTop 
+            ? "opacity-100 translate-y-0 hover:scale-110" 
+            : "opacity-0 translate-y-4 pointer-events-none"
+        )}
+        aria-label="Volver arriba"
+      >
+        <ArrowUp className="w-5 h-5" />
+      </button>
     </div>
   );
 };
