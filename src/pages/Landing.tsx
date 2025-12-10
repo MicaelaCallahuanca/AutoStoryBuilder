@@ -166,7 +166,7 @@ const Landing = () => {
             </div>
           </div>
 
-          {/* Mockup */}
+          {/* Mockup con GIF real */}
           <div className="mt-20 max-w-5xl mx-auto animate-fade-up" style={{ animationDelay: '0.2s' }}>
             <div className="relative aspect-video rounded-2xl border border-border/50 bg-card overflow-hidden card-glow">
               {/* Overlay de degradado, se mantiene */}
