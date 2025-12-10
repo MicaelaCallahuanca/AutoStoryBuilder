@@ -450,7 +450,7 @@ const Landing = () => {
               <span className="font-semibold">AutoStory</span>
             </a>
             <p className="text-sm text-muted-foreground">
-              © 2024 AutoStory. Generador de historias visuales con IA.
+              © 2025 AutoStory. Generador de historias visuales con IA.
             </p>
           </div>
         </div>
