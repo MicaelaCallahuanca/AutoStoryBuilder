@@ -337,10 +337,10 @@ const Dashboard = () => {
               )}
             >
               <div className={cn(
-                "flex items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20",
+                "flex items-center justify-center rounded-xl bg-accent-brand/20 border border-accent-brand/30",
                 sidebarCollapsed ? "w-10 h-10" : "w-12 h-12"
               )}>
-                <Sparkles className={cn("text-primary", sidebarCollapsed ? "w-5 h-5" : "w-6 h-6")} />
+                <Sparkles className={cn("text-accent-brand", sidebarCollapsed ? "w-5 h-5" : "w-6 h-6")} />
               </div>
               {!sidebarCollapsed && (
                 <span className="font-semibold text-base tracking-tight">AutoStory</span>
@@ -447,7 +447,7 @@ const Dashboard = () => {
               {activeSection === 'nueva' && (
                 <>
                   {/* Sección superior – Subida de imagen */}
-                  <div className="rounded-2xl border border-border/50 bg-card p-6 lg:p-8 shadow-sm">
+                  <div className="rounded-2xl border border-border/50 bg-card p-6 lg:p-8 card-glow">
                     <h3 className="text-sm font-medium mb-5 text-foreground/90">Subir imagen (opcional)</h3>
                     
                     {!uploadedImage ? (
@@ -506,7 +506,7 @@ const Dashboard = () => {
                   </div>
 
                   {/* Sección inferior – Texto + opciones */}
-                  <div className="rounded-2xl border border-border/50 bg-card p-6 lg:p-8 shadow-sm">
+                  <div className="rounded-2xl border border-border/50 bg-card p-6 lg:p-8 card-glow">
                     <h3 className="text-sm font-medium mb-5 text-foreground/90">Idea central y configuración</h3>
                     
                     <div className="space-y-5">
@@ -596,7 +596,7 @@ const Dashboard = () => {
                         <Button
                           onClick={handleGenerateStory}
                           disabled={isGenerating}
-                          className="w-full rounded-xl h-11 text-sm font-medium shadow-sm"
+                          className="w-full rounded-xl h-11 text-sm font-medium ytm-button-accent"
                           size="lg"
                         >
                           {isGenerating ? (
@@ -613,7 +613,7 @@ const Dashboard = () => {
                   </div>
 
                   {/* Sección de Resultado */}
-                  <div id="narrativa-generada" className="rounded-2xl border border-border/50 bg-card p-6 lg:p-8 shadow-sm scroll-mt-24">
+                  <div id="narrativa-generada" className="rounded-2xl border border-border/50 bg-card p-6 lg:p-8 card-glow scroll-mt-24">
                     <div className="flex items-center justify-between mb-5">
                       <h3 className="text-sm font-medium text-foreground/90">Narrativa generada</h3>
                       {generatedNarrative && !isEditing && (
@@ -714,7 +714,7 @@ const Dashboard = () => {
               {activeSection === 'versiones' && (
                 <div className="space-y-4">
                   {!storyId ? (
-                    <div className="rounded-2xl border border-border/50 bg-card p-12 text-center shadow-sm">
+                    <div className="rounded-2xl border border-border/50 bg-card p-12 text-center card-glow">
                       <History className="w-12 h-12 mx-auto mb-4 text-muted-foreground/40" />
                       <h3 className="text-lg font-semibold mb-2">No hay historia generada</h3>
                       <p className="text-sm text-muted-foreground">
@@ -722,12 +722,12 @@ const Dashboard = () => {
                       </p>
                     </div>
                   ) : isLoadingVersions ? (
-                    <div className="rounded-2xl border border-border/50 bg-card p-12 text-center shadow-sm">
+                    <div className="rounded-2xl border border-border/50 bg-card p-12 text-center card-glow">
                       <Loader2 className="w-12 h-12 mx-auto mb-4 text-muted-foreground/40 animate-spin" />
                       <p className="text-sm text-muted-foreground">Cargando versiones...</p>
                     </div>
                   ) : versions.length === 0 ? (
-                    <div className="rounded-2xl border border-border/50 bg-card p-12 text-center shadow-sm">
+                    <div className="rounded-2xl border border-border/50 bg-card p-12 text-center card-glow">
                       <History className="w-12 h-12 mx-auto mb-4 text-muted-foreground/40" />
                       <h3 className="text-lg font-semibold mb-2">No hay versiones guardadas</h3>
                       <p className="text-sm text-muted-foreground">
@@ -739,7 +739,7 @@ const Dashboard = () => {
                       {versions.map((version) => (
                         <div
                           key={`${version.story_id}-${version.major}-${version.minor}`}
-                          className="rounded-2xl border border-border/50 bg-card p-5 hover:border-primary/30 hover:shadow-md transition-all duration-200 cursor-pointer group"
+                          className="rounded-2xl border border-border/50 bg-card p-5 hover:border-accent-brand/30 transition-all duration-200 cursor-pointer group card-glow"
                           onClick={() => handleSelectVersion(version.narrative)}
                         >
                           <div className="flex items-center justify-between mb-3">
@@ -770,7 +770,7 @@ const Dashboard = () => {
 
               {activeSection === 'ajustes' && (
                 <div className="space-y-6">
-                  <div className="rounded-2xl border border-border/50 bg-card p-6 lg:p-8 shadow-sm space-y-5">
+                  <div className="rounded-2xl border border-border/50 bg-card p-6 lg:p-8 card-glow space-y-5">
                     <h3 className="font-semibold text-foreground/90">Preferencias generales</h3>
                     
                     {/* Idioma de salida */}
@@ -821,7 +821,7 @@ const Dashboard = () => {
       <button
         onClick={scrollToTop}
         className={cn(
-          "fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-foreground text-background shadow-lg flex items-center justify-center transition-all duration-300",
+          "fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full scroll-btn text-foreground flex items-center justify-center transition-all duration-300",
           showScrollTop 
             ? "opacity-100 translate-y-0 hover:scale-110" 
             : "opacity-0 translate-y-4 pointer-events-none"

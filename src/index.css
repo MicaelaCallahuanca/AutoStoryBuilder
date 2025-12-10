@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* YouTube Music inspired dark theme design system */
+/* YouTube Music inspired dark theme design system with accent colors */
 
 @layer base {
   :root {
@@ -52,8 +52,18 @@
     --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     
-    /* Red accent for highlights (like YouTube) */
+    /* Accent color - Electric violet/purple */
+    --accent-brand: 262 83% 58%;
+    --accent-brand-foreground: 0 0% 100%;
+    --accent-brand-glow: 262 83% 58%;
+    
+    /* Secondary accent - Red (YouTube style) */
     --accent-red: 0 100% 50%;
+    
+    /* Gradient colors for hero animation */
+    --gradient-1: 262 83% 58%;
+    --gradient-2: 330 85% 60%;
+    --gradient-3: 200 90% 55%;
   }
 
   .dark {
@@ -96,6 +106,10 @@
 
     --subtle-border: 0 0% 14%;
     --hover-bg: 0 0% 12%;
+    
+    --accent-brand: 262 83% 58%;
+    --accent-brand-foreground: 0 0% 100%;
+    --accent-brand-glow: 262 83% 58%;
   }
 }
 
@@ -128,7 +142,22 @@
   }
   
   .hover-lift {
-    @apply transition-smooth hover:-translate-y-1 hover:shadow-lg;
+    @apply transition-smooth hover:-translate-y-1;
+  }
+  
+  /* Card glow shadow */
+  .card-glow {
+    box-shadow: 
+      0 0 0 1px hsl(var(--border) / 0.5),
+      0 4px 20px -4px hsl(var(--accent-brand) / 0.1),
+      0 8px 30px -8px hsl(0 0% 0% / 0.3);
+  }
+  
+  .card-glow:hover {
+    box-shadow: 
+      0 0 0 1px hsl(var(--accent-brand) / 0.3),
+      0 4px 25px -4px hsl(var(--accent-brand) / 0.2),
+      0 12px 40px -8px hsl(0 0% 0% / 0.4);
   }
   
   /* YouTube Music style button hover */
@@ -138,6 +167,16 @@
   
   .ytm-button-primary {
     @apply bg-foreground text-background hover:bg-foreground/90 hover:scale-105;
+  }
+  
+  .ytm-button-accent {
+    background: linear-gradient(135deg, hsl(var(--gradient-1)), hsl(var(--gradient-2)));
+    @apply text-white hover:scale-105 shadow-lg;
+    box-shadow: 0 4px 20px -4px hsl(var(--accent-brand) / 0.5);
+  }
+  
+  .ytm-button-accent:hover {
+    box-shadow: 0 6px 25px -4px hsl(var(--accent-brand) / 0.6);
   }
   
   .ytm-button-outline {
@@ -159,11 +198,78 @@
   }
   
   .nav-link::after {
-    @apply content-[''] absolute bottom-0 left-0 w-0 h-0.5 bg-foreground transition-all duration-300;
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300;
+    background: linear-gradient(90deg, hsl(var(--gradient-1)), hsl(var(--gradient-2)));
   }
   
   .nav-link:hover::after {
     @apply w-full;
+  }
+  
+  /* Animated gradient text for hero */
+  .gradient-text-animated {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--gradient-1)),
+      hsl(var(--gradient-2)),
+      hsl(var(--gradient-3)),
+      hsl(var(--gradient-1))
+    );
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientShift 6s ease-in-out infinite;
+  }
+  
+  /* Hero background glow */
+  .hero-glow {
+    position: relative;
+  }
+  
+  .hero-glow::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+      ellipse 60% 50% at 50% 50%,
+      hsl(var(--accent-brand) / 0.15) 0%,
+      hsl(var(--gradient-2) / 0.08) 30%,
+      transparent 70%
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  /* Accent link */
+  .accent-link {
+    @apply text-foreground/80 hover:text-foreground transition-colors duration-200;
+    position: relative;
+  }
+  
+  .accent-link:hover {
+    color: hsl(var(--gradient-1));
+  }
+  
+  /* Scroll button style */
+  .scroll-btn {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border) / 0.5);
+    box-shadow: 
+      0 4px 20px -4px hsl(0 0% 0% / 0.4),
+      0 0 0 1px hsl(var(--accent-brand) / 0.1);
+  }
+  
+  .scroll-btn:hover {
+    box-shadow: 
+      0 6px 25px -4px hsl(0 0% 0% / 0.5),
+      0 0 0 1px hsl(var(--accent-brand) / 0.3);
+    border-color: hsl(var(--accent-brand) / 0.3);
   }
 }
 
@@ -184,5 +290,17 @@
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
   }
 }
