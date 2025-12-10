@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ArrowRight, Upload, Sparkles, FileText, CheckCircle2, Zap, Users, TrendingUp, Send, Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ArrowRight, Upload, Sparkles, FileText, CheckCircle2, Zap, Users, TrendingUp, Send, Menu, X, ArrowUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -14,6 +14,20 @@ const Landing = () => {
     mensaje: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Handle scroll to show/hide scroll-to-top button
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -55,8 +69,8 @@ const Landing = () => {
             href="https://auto-story-builder-one.vercel.app/"
             className="flex items-center gap-3 group"
           >
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-foreground/10 border border-foreground/20 group-hover:bg-foreground/20 transition-all duration-300">
-              <Sparkles className="w-5 h-5 text-foreground" />
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-accent-brand/20 border border-accent-brand/30 group-hover:bg-accent-brand/30 transition-all duration-300">
+              <Sparkles className="w-5 h-5 text-accent-brand" />
             </div>
             <span className="font-semibold text-lg tracking-tight">AutoStory</span>
           </a>
@@ -74,13 +88,13 @@ const Landing = () => {
             ))}
           </nav>
 
-          {/* Contact Button */}
+          {/* Generate Button */}
           <div className="hidden md:block">
             <Button 
-              onClick={() => scrollToSection('contacto')}
-              className="rounded-full px-6 bg-foreground text-background hover:bg-foreground/90 transition-all duration-200 hover:scale-105"
+              onClick={() => navigate('/dashboard')}
+              className="rounded-full px-6 ytm-button-accent"
             >
-              Contacto
+              Generar
             </Button>
           </div>
 
@@ -107,10 +121,10 @@ const Landing = () => {
                 </button>
               ))}
               <Button 
-                onClick={() => scrollToSection('contacto')}
-                className="mt-2 rounded-full bg-foreground text-background hover:bg-foreground/90"
+                onClick={() => navigate('/dashboard')}
+                className="mt-2 rounded-full ytm-button-accent"
               >
-                Contacto
+                Generar
               </Button>
             </nav>
           </div>
@@ -118,12 +132,12 @@ const Landing = () => {
       </header>
 
       {/* Hero Section */}
-      <section id="hero" className="pt-32 pb-24 md:py-40">
-        <div className="container mx-auto px-6">
+      <section id="hero" className="pt-32 pb-24 md:py-40 hero-glow relative overflow-hidden">
+        <div className="container mx-auto px-6 relative z-10">
           <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-up">
             <div className="space-y-6">
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
-                Historias visuales
+                <span className="gradient-text-animated">Historias visuales</span>
                 <br />
                 <span className="text-muted-foreground">que cuentan más</span>
               </h1>
@@ -135,7 +149,7 @@ const Landing = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button 
                 size="lg" 
-                className="rounded-full px-8 py-6 text-base gap-2 bg-foreground text-background hover:bg-foreground/90 hover:scale-105 transition-all duration-200 shadow-lg"
+                className="rounded-full px-8 py-6 text-base gap-2 ytm-button-accent"
                 onClick={() => navigate('/dashboard')}
               >
                 Probar el Generador
@@ -154,12 +168,12 @@ const Landing = () => {
 
           {/* Mockup */}
           <div className="mt-20 max-w-5xl mx-auto animate-fade-up" style={{ animationDelay: '0.2s' }}>
-            <div className="relative aspect-video rounded-2xl border border-border/50 bg-card overflow-hidden shadow-2xl">
-              <div className="absolute inset-0 bg-gradient-to-br from-muted/30 to-background/50" />
+            <div className="relative aspect-video rounded-2xl border border-border/50 bg-card overflow-hidden card-glow">
+              <div className="absolute inset-0 bg-gradient-to-br from-accent-brand/10 via-background/50 to-background/80" />
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center space-y-4 p-8">
-                  <div className="w-16 h-16 mx-auto rounded-2xl bg-foreground/10 flex items-center justify-center">
-                    <Sparkles className="w-8 h-8 text-muted-foreground" />
+                  <div className="w-16 h-16 mx-auto rounded-2xl bg-accent-brand/20 flex items-center justify-center">
+                    <Sparkles className="w-8 h-8 text-accent-brand" />
                   </div>
                   <p className="text-sm text-muted-foreground">Vista previa del generador</p>
                 </div>
@@ -174,7 +188,7 @@ const Landing = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16">
             <div className="space-y-6 animate-fade-up">
-              <div className="inline-block px-4 py-1.5 rounded-full bg-card border border-border/50 text-xs font-medium">
+              <div className="inline-block px-4 py-1.5 rounded-full bg-card border border-border/50 text-xs font-medium card-glow">
                 El problema
               </div>
               <h2 className="text-3xl md:text-4xl font-bold leading-tight">
@@ -189,7 +203,7 @@ const Landing = () => {
             </div>
 
             <div className="space-y-6 animate-fade-up" style={{ animationDelay: '0.1s' }}>
-              <div className="inline-block px-4 py-1.5 rounded-full bg-card border border-border/50 text-xs font-medium">
+              <div className="inline-block px-4 py-1.5 rounded-full bg-card border border-accent-brand/30 text-xs font-medium card-glow">
                 La solución
               </div>
               <h2 className="text-3xl md:text-4xl font-bold leading-tight">
@@ -243,11 +257,11 @@ const Landing = () => {
                   className="space-y-5 animate-fade-up"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl border border-border/50 bg-card">
-                    <item.icon className="w-6 h-6" />
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl border border-accent-brand/30 bg-card card-glow">
+                    <item.icon className="w-6 h-6 text-accent-brand" />
                   </div>
                   <div className="space-y-3">
-                    <div className="text-xs font-medium text-muted-foreground">{item.step}</div>
+                    <div className="text-xs font-medium text-accent-brand">{item.step}</div>
                     <h3 className="text-xl font-semibold">{item.title}</h3>
                     <p className="text-muted-foreground leading-relaxed">{item.description}</p>
                   </div>
@@ -289,11 +303,11 @@ const Landing = () => {
               ].map((benefit, index) => (
                 <div 
                   key={index} 
-                  className="p-6 rounded-2xl border border-border/50 bg-card space-y-4 hover-lift animate-fade-up group"
+                  className="p-6 rounded-2xl border border-border/50 bg-card space-y-4 hover-lift animate-fade-up group card-glow"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-muted/50 group-hover:bg-foreground/10 transition-colors duration-300">
-                    <benefit.icon className="w-5 h-5" />
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-accent-brand/10 group-hover:bg-accent-brand/20 transition-colors duration-300">
+                    <benefit.icon className="w-5 h-5 text-accent-brand" />
                   </div>
                   <div className="space-y-2">
                     <h3 className="text-lg font-semibold">{benefit.title}</h3>
@@ -321,17 +335,17 @@ const Landing = () => {
               {[1, 2, 3, 4].map((item, index) => (
                 <div 
                   key={item} 
-                  className="group rounded-2xl border border-border/50 bg-card overflow-hidden hover-lift animate-fade-up"
+                  className="group rounded-2xl border border-border/50 bg-card overflow-hidden hover-lift animate-fade-up card-glow"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   <div className="aspect-video bg-muted/30 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-muted/50 to-background/80" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-accent-brand/10 to-background/80" />
                     <div className="absolute inset-0 flex items-center justify-center">
                       <FileText className="w-12 h-12 text-muted-foreground/30" />
                     </div>
                   </div>
                   <div className="p-6 space-y-2">
-                    <h3 className="font-semibold group-hover:text-foreground transition-colors">Historia de ejemplo {item}</h3>
+                    <h3 className="font-semibold group-hover:text-accent-brand transition-colors">Historia de ejemplo {item}</h3>
                     <p className="text-sm text-muted-foreground">
                       Narrativa visual generada automáticamente a partir de datos estructurados.
                     </p>
@@ -344,12 +358,14 @@ const Landing = () => {
       </section>
 
       {/* CTA */}
-      <section className="py-24 border-t border-border/30">
-        <div className="container mx-auto px-6">
+      <section className="py-24 border-t border-border/30 hero-glow relative overflow-hidden">
+        <div className="container mx-auto px-6 relative z-10">
           <div className="max-w-3xl mx-auto text-center space-y-8 animate-fade-up">
             <div className="space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold leading-tight">
-                Comienza a crear historias hoy
+                <span className="gradient-text-animated">Comienza a crear</span>
+                <br />
+                historias hoy
               </h2>
               <p className="text-lg text-muted-foreground">
                 Sin configuración complicada. Sin curva de aprendizaje. Solo resultados.
@@ -358,7 +374,7 @@ const Landing = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button 
                 size="lg" 
-                className="rounded-full px-8 py-6 text-base gap-2 bg-foreground text-background hover:bg-foreground/90 hover:scale-105 transition-all duration-200 shadow-lg"
+                className="rounded-full px-8 py-6 text-base gap-2 ytm-button-accent"
                 onClick={() => navigate('/dashboard')}
               >
                 Probar el Generador
@@ -390,7 +406,7 @@ const Landing = () => {
                   value={contactForm.nombre}
                   onChange={(e) => setContactForm({ ...contactForm, nombre: e.target.value })}
                   placeholder="Tu nombre"
-                  className="w-full px-4 py-3 rounded-xl border border-border/50 bg-background text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/30 transition-all duration-200"
+                  className="w-full px-4 py-3 rounded-xl border border-border/50 bg-background text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-accent-brand/30 focus:border-accent-brand/50 transition-all duration-200"
                 />
               </div>
               <div>
@@ -402,7 +418,7 @@ const Landing = () => {
                   value={contactForm.email}
                   onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
                   placeholder="tu@email.com"
-                  className="w-full px-4 py-3 rounded-xl border border-border/50 bg-background text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/30 transition-all duration-200"
+                  className="w-full px-4 py-3 rounded-xl border border-border/50 bg-background text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-accent-brand/30 focus:border-accent-brand/50 transition-all duration-200"
                 />
               </div>
               <div>
@@ -414,13 +430,13 @@ const Landing = () => {
                   onChange={(e) => setContactForm({ ...contactForm, mensaje: e.target.value })}
                   placeholder="¿En qué podemos ayudarte?"
                   rows={4}
-                  className="w-full px-4 py-3 rounded-xl border border-border/50 bg-background text-foreground placeholder:text-muted-foreground/50 resize-none focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/30 transition-all duration-200"
+                  className="w-full px-4 py-3 rounded-xl border border-border/50 bg-background text-foreground placeholder:text-muted-foreground/50 resize-none focus:outline-none focus:ring-2 focus:ring-accent-brand/30 focus:border-accent-brand/50 transition-all duration-200"
                 />
               </div>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full rounded-xl py-6 text-base gap-2 bg-foreground text-background hover:bg-foreground/90 transition-all duration-200"
+                className="w-full rounded-xl py-6 text-base gap-2 ytm-button-accent"
               >
                 {isSubmitting ? (
                   "Enviando..."
@@ -444,8 +460,8 @@ const Landing = () => {
               href="https://auto-story-builder-one.vercel.app/"
               className="flex items-center gap-3 group"
             >
-              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-foreground/10 border border-foreground/20 group-hover:bg-foreground/20 transition-all duration-300">
-                <Sparkles className="w-4 h-4 text-foreground" />
+              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-accent-brand/20 border border-accent-brand/30 group-hover:bg-accent-brand/30 transition-all duration-300">
+                <Sparkles className="w-4 h-4 text-accent-brand" />
               </div>
               <span className="font-semibold">AutoStory</span>
             </a>
@@ -455,6 +471,20 @@ const Landing = () => {
           </div>
         </div>
       </footer>
+
+      {/* Scroll to top button - Left side */}
+      <button
+        onClick={scrollToTop}
+        className={cn(
+          "fixed bottom-6 left-6 z-50 w-12 h-12 rounded-full scroll-btn text-foreground flex items-center justify-center transition-all duration-300",
+          showScrollTop 
+            ? "opacity-100 translate-y-0 hover:scale-110" 
+            : "opacity-0 translate-y-4 pointer-events-none"
+        )}
+        aria-label="Volver arriba"
+      >
+        <ArrowUp className="w-5 h-5" />
+      </button>
     </div>
   );
 };
